@@ -44,11 +44,13 @@ export default function LoginPage(): React.ReactElement {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6 py-16">
-      <div className="w-full max-w-md rounded-xl border border-sentinel-border bg-sentinel-panel p-8 shadow-xl">
-        <h1 className="text-2xl font-semibold text-white">Sign in</h1>
+    <div className="w-full max-w-md">
+      <div className="surface p-8 shadow-card">
+        <h1 className="text-xl font-semibold tracking-tight text-white">
+          Sign in
+        </h1>
         <p className="mt-1 text-sm text-sentinel-muted">
-          Access your Bulletproof Sentinel AI console.
+          Access your Sentinel operations console.
         </p>
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <Field
@@ -75,13 +77,13 @@ export default function LoginPage(): React.ReactElement {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-md bg-sentinel-accent px-4 py-2.5 text-sm font-medium text-slate-900 hover:bg-cyan-300 disabled:opacity-60"
+            className="w-full rounded-lg bg-sentinel-accent px-4 py-2.5 text-sm font-semibold text-slate-900 transition-colors hover:bg-cyan-300 disabled:opacity-60"
           >
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
 
-        <div className="my-5 flex items-center gap-3 text-[11px] uppercase tracking-wide text-sentinel-muted">
+        <div className="my-5 flex items-center gap-3 text-[11px] uppercase tracking-wide text-sentinel-faint">
           <span className="h-px flex-1 bg-sentinel-border" />
           or
           <span className="h-px flex-1 bg-sentinel-border" />
@@ -89,12 +91,12 @@ export default function LoginPage(): React.ReactElement {
         <GoogleSignInButton />
         <p className="mt-6 text-center text-xs text-sentinel-muted">
           No account?{" "}
-          <Link href="/signup" className="text-sentinel-accent hover:underline">
+          <Link href="/signup" className="font-medium text-sentinel-accent hover:underline">
             Create one
           </Link>
         </p>
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -126,7 +128,7 @@ function Field({
         autoComplete={autoComplete}
         required={required}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 block w-full rounded-md border border-sentinel-border bg-sentinel-bg px-3 py-2 text-sm text-slate-100 outline-none focus:border-sentinel-accent"
+        className="mt-1.5 block w-full rounded-lg border border-sentinel-border bg-sentinel-bg px-3 py-2 text-sm text-slate-100 outline-none transition-colors placeholder:text-sentinel-faint focus:border-sentinel-accent/70 focus:ring-2 focus:ring-sentinel-accent/20"
       />
     </label>
   );

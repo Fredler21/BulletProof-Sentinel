@@ -8,56 +8,92 @@
 
 html,
 body {
-  background-color: #04060d;
-  color: #e2e8f0;
+  background-color: #0a0e16;
+  color: #e7ecf4;
 }
 
 body {
-  font-feature-settings: "ss01", "cv01";
+  font-feature-settings: "ss01", "cv01", "tnum";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
+::selection {
+  background: rgba(34, 211, 238, 0.25);
+  color: #f8fafc;
+}
+
+/* Global thin, unobtrusive scrollbars for a product-grade feel */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #26324a transparent;
+}
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #26324a;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #33425f;
+  background-clip: content-box;
+}
 .scrollbar-thin::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #1f2a44;
-  border-radius: 4px;
-}
 
-/* ---------- Cyber UI utilities ---------- */
+/* ---------- App surfaces (Refined SOC) ---------- */
 
-/* Holographic background — aurora gradient that subtly shifts */
+/* Calm command-center background — a restrained slate wash, no aurora. */
 .holo-bg {
   background:
-    radial-gradient(60rem 60rem at 10% -10%, rgba(168, 85, 247, 0.18), transparent 60%),
-    radial-gradient(50rem 50rem at 90% 10%, rgba(34, 211, 238, 0.15), transparent 55%),
-    radial-gradient(70rem 70rem at 50% 110%, rgba(255, 43, 214, 0.12), transparent 60%),
-    linear-gradient(180deg, #04060d 0%, #02030a 100%);
+    radial-gradient(48rem 40rem at 12% -10%, rgba(34, 211, 238, 0.06), transparent 60%),
+    radial-gradient(44rem 38rem at 100% 0%, rgba(56, 189, 248, 0.045), transparent 55%),
+    linear-gradient(180deg, #0a0e16 0%, #080b12 100%);
+  background-attachment: fixed;
 }
 
-/* Subtle hex grid overlay (CSS-only) */
+/* Faint grid overlay — kept very subtle for texture. */
 .hex-grid::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(34, 211, 238, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(34, 211, 238, 0.04) 1px, transparent 1px);
-  background-size: 28px 28px;
+    linear-gradient(rgba(148, 163, 184, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.028) 1px, transparent 1px);
+  background-size: 32px 32px;
   pointer-events: none;
-  mask-image: radial-gradient(ellipse at center, black 60%, transparent 100%);
+  mask-image: radial-gradient(ellipse at 50% 0%, black 45%, transparent 100%);
 }
 
-/* Glassmorphism panel */
+/* Reusable card surface for the redesigned screens. */
+.surface {
+  background-color: #111726;
+  border: 1px solid #1e2739;
+  border-radius: 0.75rem;
+}
+.surface-hover {
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.surface-hover:hover {
+  border-color: #2b3850;
+  background-color: #161e30;
+}
+
+/* Refined translucent panel — subtler blur, neutral tint. */
 .glass {
-  background: linear-gradient(160deg, rgba(15, 22, 38, 0.65), rgba(8, 12, 24, 0.5));
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: linear-gradient(180deg, rgba(17, 23, 38, 0.82), rgba(13, 18, 30, 0.78));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.1);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 18px 60px -20px rgba(0, 0, 0, 0.7);
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 12px 40px -24px rgba(0, 0, 0, 0.8);
 }
 
 /* Animated holographic border */

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getSessionUser } from "@/lib/server/session";
 import { ensureRoleForUser, ROLE_LABEL } from "@/lib/server/roles";
 import { LogoutButton } from "@/app/dashboard/_components/LogoutButton";
-import { TopMarquee } from "@/app/dashboard/_components/TopMarquee";
+import { NavLink } from "@/app/dashboard/_components/NavLink";
 
 const NAV_GROUPS: {
   label: string;
@@ -12,28 +12,28 @@ const NAV_GROUPS: {
   {
     label: "Operations",
     items: [
-      { href: "/dashboard", label: "Overview", icon: "◐" },
+      { href: "/dashboard", label: "Overview", icon: "◱" },
       { href: "/dashboard/events", label: "Events", icon: "≡" },
-      { href: "/dashboard/incidents", label: "Incidents", icon: "▲" },
-      { href: "/dashboard/alerts", label: "Alerts", icon: "✦" },
+      { href: "/dashboard/incidents", label: "Incidents", icon: "◆" },
+      { href: "/dashboard/alerts", label: "Alerts", icon: "!" },
     ],
   },
   {
     label: "Defense",
     items: [
       { href: "/dashboard/scanner", label: "Scanner", icon: "◎" },
-      { href: "/dashboard/honeypots", label: "Honeypots", icon: "✸" },
-      { href: "/dashboard/projects", label: "Embed API", icon: "⌬" },
-      { href: "/dashboard/blocklist", label: "Blocklist", icon: "⛔" },
+      { href: "/dashboard/honeypots", label: "Honeypots", icon: "✧" },
+      { href: "/dashboard/projects", label: "Embed API", icon: "⌘" },
+      { href: "/dashboard/blocklist", label: "Blocklist", icon: "⊘" },
     ],
   },
   {
     label: "Intelligence",
     items: [
-      { href: "/dashboard/copilot", label: "AI Copilot", icon: "✺" },
-      { href: "/dashboard/posture", label: "Posture", icon: "❖" },
-      { href: "/dashboard/compliance", label: "Compliance", icon: "▣" },
-      { href: "/dashboard/reports", label: "Reports", icon: "❑" },
+      { href: "/dashboard/copilot", label: "AI Copilot", icon: "✦" },
+      { href: "/dashboard/posture", label: "Posture", icon: "◈" },
+      { href: "/dashboard/compliance", label: "Compliance", icon: "▤" },
+      { href: "/dashboard/reports", label: "Reports", icon: "▥" },
     ],
   },
 ];
@@ -49,93 +49,91 @@ export default async function DashboardLayout({
   }
   const role = await ensureRoleForUser(user);
   const isSuperAdmin = role.role === "super-admin";
-  const initial = (user.displayName ?? user.email ?? "U")
-    .slice(0, 1)
-    .toUpperCase();
+  const displayName = user.displayName ?? user.email ?? user.uid;
+  const initial = displayName.slice(0, 1).toUpperCase();
 
   return (
-    <div className="holo-bg relative min-h-screen text-slate-200">
+    <div className="holo-bg relative min-h-screen text-sentinel-fg">
       <div className="hex-grid pointer-events-none absolute inset-0" />
       <div className="relative flex min-h-screen">
         {/* Sidebar */}
-        <aside className="hidden w-64 shrink-0 p-3 md:block">
-          <div className="glass sticky top-3 flex h-[calc(100vh-1.5rem)] flex-col rounded-2xl">
-            <div className="hud-frame border-b border-white/5 p-4">
-              <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-neon-cyan/80">
-                ▎SENTINEL · v5.1
-              </p>
-              <p className="text-holo mt-1 font-mono text-base font-semibold tracking-wider">
-                CYBER&nbsp;DEFENSE&nbsp;OS
-              </p>
-              <p className="mt-1 font-mono text-[10px] text-slate-500">
-                AI-augmented SOC
-              </p>
+        <aside className="hidden w-60 shrink-0 border-r border-sentinel-border/70 md:flex md:flex-col">
+          <div className="sticky top-0 flex h-screen flex-col">
+            {/* Brand */}
+            <div className="flex items-center gap-2.5 px-5 py-5">
+              <span className="grid h-8 w-8 place-items-center rounded-lg border border-sentinel-accent/30 bg-sentinel-accent/10 text-sentinel-accent">
+                <span className="text-sm font-bold">S</span>
+              </span>
+              <div className="leading-tight">
+                <p className="text-sm font-semibold tracking-tight text-white">
+                  Sentinel
+                </p>
+                <p className="text-[10px] uppercase tracking-[0.18em] text-sentinel-faint">
+                  Security Operations
+                </p>
+              </div>
             </div>
 
-            <Link
-              href="/dashboard/live"
-              className="holo-border glow-pulse mx-3 mt-3 flex items-center justify-between rounded-xl border border-neon-cyan/30 bg-black/40 px-3 py-2.5 font-mono text-[11px] uppercase tracking-[0.25em] text-neon-cyan hover:bg-neon-cyan/10"
-            >
-              <span className="flex items-center gap-2">
-                <span className="relative inline-flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-pulse-ring rounded-full bg-neon-green/80" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-neon-green" />
+            {/* Live console CTA */}
+            <div className="px-3">
+              <Link
+                href="/dashboard/live"
+                className="flex items-center justify-between rounded-lg border border-sentinel-border bg-sentinel-panel px-3 py-2 text-[12px] font-medium text-slate-200 transition-colors hover:border-sentinel-accent/40 hover:text-white"
+              >
+                <span className="flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-pulse-ring rounded-full bg-sentinel-ok/70" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-sentinel-ok" />
+                  </span>
+                  Live Console
                 </span>
-                ▌ Live Console
-              </span>
-              <span className="text-[10px] text-neon-cyan/60">↗</span>
-            </Link>
+                <span className="text-sentinel-faint">↗</span>
+              </Link>
+            </div>
 
-            <nav className="flex-1 overflow-y-auto p-3 text-sm">
+            {/* Nav */}
+            <nav className="mt-4 flex-1 overflow-y-auto px-3 pb-4">
               {NAV_GROUPS.map((g) => (
-                <div key={g.label} className="mb-4">
-                  <p className="mb-1 px-2 font-mono text-[10px] uppercase tracking-[0.3em] text-slate-500">
+                <div key={g.label} className="mb-5">
+                  <p className="mb-1.5 px-2.5 text-[10px] font-medium uppercase tracking-[0.16em] text-sentinel-faint">
                     {g.label}
                   </p>
-                  {g.items.map((it) => (
-                    <NavLink
-                      key={it.href}
-                      href={it.href}
-                      label={it.label}
-                      icon={it.icon}
-                    />
-                  ))}
+                  <div className="space-y-0.5">
+                    {g.items.map((it) => (
+                      <NavLink
+                        key={it.href}
+                        href={it.href}
+                        label={it.label}
+                        icon={it.icon}
+                      />
+                    ))}
+                  </div>
                 </div>
               ))}
               {isSuperAdmin && (
-                <div className="mb-4">
-                  <p className="mb-1 px-2 font-mono text-[10px] uppercase tracking-[0.3em] text-slate-500">
+                <div className="mb-5">
+                  <p className="mb-1.5 px-2.5 text-[10px] font-medium uppercase tracking-[0.16em] text-sentinel-faint">
                     Admin
                   </p>
-                  <NavLink href="/dashboard/roles" label="User Roles" icon="✦" />
+                  <NavLink href="/dashboard/roles" label="User Roles" icon="⚙" />
                 </div>
               )}
             </nav>
 
-            <div className="m-3 rounded-xl border border-white/5 bg-black/40 p-3">
-              <div className="flex items-center gap-2">
-                <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-neon-cyan to-neon-purple font-mono text-sm font-bold text-black">
+            {/* User */}
+            <div className="border-t border-sentinel-border/70 p-3">
+              <div className="flex items-center gap-2.5 rounded-lg px-1.5 py-1">
+                <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-sentinel-accent/15 text-xs font-semibold text-sentinel-accent">
                   {initial}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-medium text-white">
-                    {user.displayName ?? user.email ?? user.uid}
+                  <p className="truncate text-[13px] font-medium text-white">
+                    {displayName}
                   </p>
-                  <p className="text-[10px] uppercase tracking-widest text-neon-cyan/80">
+                  <p className="text-[11px] text-sentinel-faint">
                     {ROLE_LABEL[role.role]}
                   </p>
                 </div>
-              </div>
-              <div className="mt-2 grid grid-cols-3 gap-1 text-center font-mono text-[9px] uppercase">
-                <span className="rounded bg-neon-green/10 py-1 text-neon-green">
-                  ONLINE
-                </span>
-                <span className="rounded bg-neon-cyan/10 py-1 text-neon-cyan">
-                  SECURE
-                </span>
-                <span className="rounded bg-neon-pink/10 py-1 text-neon-pink">
-                  ARMED
-                </span>
               </div>
             </div>
           </div>
@@ -143,24 +141,28 @@ export default async function DashboardLayout({
 
         {/* Main column */}
         <div className="flex min-w-0 flex-1 flex-col">
-          <TopMarquee role={ROLE_LABEL[role.role]} />
-
-          <header className="glass sticky top-0 z-30 mx-3 mt-3 flex items-center justify-between rounded-2xl px-5 py-3">
-            <div className="flex items-center gap-3">
-              <div className="hidden font-mono text-[10px] uppercase tracking-[0.35em] text-slate-400 md:block">
-                ▎THEATER · GLOBAL
-              </div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-neon-cyan">
-                THREAT LEVEL ·{" "}
-                <span className="text-neon-pink">ELEVATED</span>
-              </div>
+          <header className="sticky top-0 z-30 flex items-center justify-between border-b border-sentinel-border/70 bg-sentinel-bg/80 px-4 py-3 backdrop-blur-md md:px-6">
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 text-sm font-medium text-slate-200 md:hidden"
+            >
+              <span className="grid h-6 w-6 place-items-center rounded-md bg-sentinel-accent/10 text-xs font-bold text-sentinel-accent">
+                S
+              </span>
+              Sentinel
+            </Link>
+            <div className="hidden items-center gap-2 text-[12px] text-sentinel-faint md:flex">
+              <span className="flex h-2 w-2 items-center">
+                <span className="h-1.5 w-1.5 rounded-full bg-sentinel-ok" />
+              </span>
+              Monitoring active
             </div>
             <div className="flex items-center gap-3">
-              <div className="hidden text-right md:block">
-                <p className="font-mono text-[11px] text-slate-300">
-                  {user.displayName ?? user.email ?? user.uid}
+              <div className="hidden text-right sm:block">
+                <p className="text-[12px] font-medium text-slate-200">
+                  {displayName}
                 </p>
-                <p className="font-mono text-[10px] uppercase tracking-widest text-neon-cyan/80">
+                <p className="text-[10px] uppercase tracking-wider text-sentinel-faint">
                   {ROLE_LABEL[role.role]}
                 </p>
               </div>
@@ -168,31 +170,11 @@ export default async function DashboardLayout({
             </div>
           </header>
 
-          <main className="flex-1 px-3 py-4 md:px-4">{children}</main>
+          <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 md:px-6 md:py-8">
+            {children}
+          </main>
         </div>
       </div>
     </div>
-  );
-}
-
-function NavLink({
-  href,
-  label,
-  icon,
-}: {
-  href: string;
-  label: string;
-  icon?: string;
-}): React.ReactElement {
-  return (
-    <Link
-      href={href}
-      className="group flex items-center gap-2 rounded-md px-2 py-1.5 text-slate-400 transition hover:bg-white/5 hover:text-white"
-    >
-      <span className="w-5 text-center text-[11px] text-neon-cyan/70 group-hover:text-neon-cyan">
-        {icon ?? "·"}
-      </span>
-      <span className="text-[13px]">{label}</span>
-    </Link>
   );
 }

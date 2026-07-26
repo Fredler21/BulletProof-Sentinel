@@ -47,7 +47,7 @@ export function GoogleSignInButton({
         type="button"
         onClick={onClick}
         disabled={loading}
-        className="flex w-full items-center justify-center gap-2 rounded-md border border-sentinel-border bg-white px-4 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-100 disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-lg border border-sentinel-border bg-white px-4 py-2.5 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-100 disabled:opacity-60"
       >
         <GoogleIcon />
         {loading ? "Connecting…" : "Continue with Google"}

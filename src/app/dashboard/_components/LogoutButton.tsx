@@ -15,7 +15,7 @@ export function LogoutButton(): React.ReactElement {
   return (
     <button
       onClick={onClick}
-      className="rounded-md border border-sentinel-border px-3 py-1.5 text-xs text-slate-200 hover:bg-sentinel-bg"
+      className="rounded-lg border border-sentinel-border px-3 py-1.5 text-[12px] font-medium text-slate-300 transition-colors hover:border-sentinel-borderStrong hover:bg-sentinel-panelHover hover:text-white"
     >
       Sign out
     </button>

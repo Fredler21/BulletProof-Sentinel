@@ -48,9 +48,11 @@ export default function SignupPage(): React.ReactElement {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6 py-16">
-      <div className="w-full max-w-md rounded-xl border border-sentinel-border bg-sentinel-panel p-8 shadow-xl">
-        <h1 className="text-2xl font-semibold text-white">Create account</h1>
+    <div className="w-full max-w-md">
+      <div className="surface p-8 shadow-card">
+        <h1 className="text-xl font-semibold tracking-tight text-white">
+          Create account
+        </h1>
         <p className="mt-1 text-sm text-sentinel-muted">
           Provision your Sentinel workspace.
         </p>
@@ -63,7 +65,7 @@ export default function SignupPage(): React.ReactElement {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-sentinel-border bg-sentinel-bg px-3 py-2 text-sm text-slate-100 outline-none focus:border-sentinel-accent"
+              className="mt-1.5 block w-full rounded-lg border border-sentinel-border bg-sentinel-bg px-3 py-2 text-sm text-slate-100 outline-none transition-colors placeholder:text-sentinel-faint focus:border-sentinel-accent/70 focus:ring-2 focus:ring-sentinel-accent/20"
             />
           </label>
           <label className="block">
@@ -76,7 +78,7 @@ export default function SignupPage(): React.ReactElement {
               required
               autoComplete="email"
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-sentinel-border bg-sentinel-bg px-3 py-2 text-sm text-slate-100 outline-none focus:border-sentinel-accent"
+              className="mt-1.5 block w-full rounded-lg border border-sentinel-border bg-sentinel-bg px-3 py-2 text-sm text-slate-100 outline-none transition-colors placeholder:text-sentinel-faint focus:border-sentinel-accent/70 focus:ring-2 focus:ring-sentinel-accent/20"
             />
           </label>
           <label className="block">
@@ -90,7 +92,7 @@ export default function SignupPage(): React.ReactElement {
               minLength={8}
               autoComplete="new-password"
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-sentinel-border bg-sentinel-bg px-3 py-2 text-sm text-slate-100 outline-none focus:border-sentinel-accent"
+              className="mt-1.5 block w-full rounded-lg border border-sentinel-border bg-sentinel-bg px-3 py-2 text-sm text-slate-100 outline-none transition-colors placeholder:text-sentinel-faint focus:border-sentinel-accent/70 focus:ring-2 focus:ring-sentinel-accent/20"
             />
           </label>
           {error && (
@@ -101,13 +103,13 @@ export default function SignupPage(): React.ReactElement {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-md bg-sentinel-accent px-4 py-2.5 text-sm font-medium text-slate-900 hover:bg-cyan-300 disabled:opacity-60"
+            className="w-full rounded-lg bg-sentinel-accent px-4 py-2.5 text-sm font-semibold text-slate-900 transition-colors hover:bg-cyan-300 disabled:opacity-60"
           >
             {loading ? "Creating…" : "Create account"}
           </button>
         </form>
 
-        <div className="my-5 flex items-center gap-3 text-[11px] uppercase tracking-wide text-sentinel-muted">
+        <div className="my-5 flex items-center gap-3 text-[11px] uppercase tracking-wide text-sentinel-faint">
           <span className="h-px flex-1 bg-sentinel-border" />
           or
           <span className="h-px flex-1 bg-sentinel-border" />
@@ -115,11 +117,11 @@ export default function SignupPage(): React.ReactElement {
         <GoogleSignInButton signup />
         <p className="mt-6 text-center text-xs text-sentinel-muted">
           Already have an account?{" "}
-          <Link href="/login" className="text-sentinel-accent hover:underline">
+          <Link href="/login" className="font-medium text-sentinel-accent hover:underline">
             Sign in
           </Link>
         </p>
       </div>
-    </main>
+    </div>
   );
 }

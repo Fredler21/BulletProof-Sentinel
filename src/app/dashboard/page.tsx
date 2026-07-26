@@ -70,21 +70,24 @@ export default async function DashboardOverview(): Promise<React.ReactElement> {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-white">Overview</h1>
-        <p className="text-sm text-sentinel-muted">
+        <h1 className="text-xl font-semibold tracking-tight text-white">
+          Overview
+        </h1>
+        <p className="mt-1 text-sm text-sentinel-muted">
           Real-time visibility into your monitored infrastructure.
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatCard label="Total Events" value={stats.totalEvents} tone="default" />
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatCard label="Total Events" value={stats.totalEvents} tone="default" icon="≡" />
         <StatCard
           label="High Severity"
           value={stats.highSeverityEvents}
           tone="danger"
+          icon="!"
         />
-        <StatCard label="Honeypot Hits" value={stats.honeypotHits} tone="warn" />
-        <StatCard label="Unique IPs" value={stats.uniqueIps} tone="default" />
+        <StatCard label="Honeypot Hits" value={stats.honeypotHits} tone="warn" icon="✧" />
+        <StatCard label="Unique IPs" value={stats.uniqueIps} tone="default" icon="◈" />
       </div>
 
       {projects.length > 0 && (
@@ -167,10 +170,12 @@ function StatCard({
   label,
   value,
   tone,
+  icon,
 }: {
   label: string;
   value: number;
   tone: "default" | "danger" | "warn";
+  icon: string;
 }): React.ReactElement {
   const accent =
     tone === "danger"
@@ -178,12 +183,28 @@ function StatCard({
       : tone === "warn"
         ? "text-sentinel-warn"
         : "text-sentinel-accent";
+  const iconBg =
+    tone === "danger"
+      ? "bg-sentinel-danger/10 text-sentinel-danger"
+      : tone === "warn"
+        ? "bg-sentinel-warn/10 text-sentinel-warn"
+        : "bg-sentinel-accent/10 text-sentinel-accent";
   return (
-    <div className="rounded-xl border border-sentinel-border bg-sentinel-panel p-5">
-      <p className="text-xs uppercase tracking-wide text-sentinel-muted">
-        {label}
+    <div className="surface surface-hover p-4 shadow-card">
+      <div className="flex items-center justify-between">
+        <p className="text-[11px] font-medium uppercase tracking-wide text-sentinel-muted">
+          {label}
+        </p>
+        <span
+          className={`grid h-7 w-7 place-items-center rounded-lg text-xs ${iconBg}`}
+          aria-hidden
+        >
+          {icon}
+        </span>
+      </div>
+      <p className={`mt-3 text-2xl font-semibold tabular-nums ${accent}`}>
+        {value.toLocaleString()}
       </p>
-      <p className={`mt-2 text-3xl font-semibold ${accent}`}>{value}</p>
     </div>
   );
 }
@@ -198,11 +219,11 @@ function Panel({
   className?: string;
 }): React.ReactElement {
   return (
-    <section
-      className={`rounded-xl border border-sentinel-border bg-sentinel-panel ${className ?? ""}`}
-    >
-      <header className="border-b border-sentinel-border px-5 py-3">
-        <h2 className="text-sm font-medium text-white">{title}</h2>
+    <section className={`surface shadow-card ${className ?? ""}`}>
+      <header className="flex items-center justify-between border-b border-sentinel-border px-5 py-3.5">
+        <h2 className="text-[13px] font-semibold tracking-tight text-white">
+          {title}
+        </h2>
       </header>
       <div className="p-5">{children}</div>
     </section>
@@ -220,33 +241,35 @@ function EventTable({
     );
   }
   return (
-    <div className="overflow-x-auto">
+    <div className="-mx-5 -mb-5 overflow-x-auto">
       <table className="w-full text-left text-sm">
-        <thead className="text-xs uppercase tracking-wide text-sentinel-muted">
-          <tr>
-            <th className="pb-2 pr-4">Time</th>
-            <th className="pb-2 pr-4">Severity</th>
-            <th className="pb-2 pr-4">Type</th>
-            <th className="pb-2 pr-4">IP</th>
-            <th className="pb-2">Message</th>
+        <thead className="text-[10px] uppercase tracking-wider text-sentinel-faint">
+          <tr className="border-b border-sentinel-border">
+            <th className="px-5 py-2 font-medium">Time</th>
+            <th className="px-2 py-2 font-medium">Severity</th>
+            <th className="px-2 py-2 font-medium">Type</th>
+            <th className="px-2 py-2 font-medium">IP</th>
+            <th className="px-5 py-2 font-medium">Message</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-sentinel-border/60">
+        <tbody className="divide-y divide-sentinel-border/50">
           {events.map((e) => (
-            <tr key={e.id}>
-              <td className="py-2 pr-4 text-sentinel-muted">
+            <tr key={e.id} className="transition-colors hover:bg-white/[0.02]">
+              <td className="whitespace-nowrap px-5 py-2.5 text-xs text-sentinel-muted">
                 <TimeAgo timestamp={e.createdAt} />
               </td>
-              <td className="py-2 pr-4">
+              <td className="px-2 py-2.5">
                 <SeverityBadge severity={e.severity as ThreatSeverity} />
               </td>
-              <td className="py-2 pr-4 font-mono text-xs text-slate-300">
+              <td className="px-2 py-2.5 font-mono text-[11px] text-slate-300">
                 {e.type}
               </td>
-              <td className="py-2 pr-4 font-mono text-xs text-slate-300">
+              <td className="px-2 py-2.5 font-mono text-[11px] text-slate-300">
                 {e.ip ?? "—"}
               </td>
-              <td className="py-2 text-slate-200">{e.message}</td>
+              <td className="max-w-0 truncate px-5 py-2.5 text-slate-200">
+                {e.message}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -264,20 +287,22 @@ function AlertList({
     return <p className="text-sm text-sentinel-muted">No active alerts.</p>;
   }
   return (
-    <ul className="space-y-3">
+    <ul className="space-y-2.5">
       {alerts.map((a) => (
         <li
           key={a.id}
-          className="rounded-md border border-sentinel-border bg-sentinel-bg p-3"
+          className="rounded-lg border border-sentinel-border bg-sentinel-bg/40 p-3 transition-colors hover:border-sentinel-borderStrong"
         >
           <div className="flex items-center justify-between">
             <SeverityBadge severity={a.severity} />
-            <span className="text-xs text-sentinel-muted">
+            <span className="text-[11px] text-sentinel-faint">
               <TimeAgo timestamp={a.createdAt} />
             </span>
           </div>
-          <p className="mt-2 text-sm text-slate-100">{a.title}</p>
-          <p className="mt-1 font-mono text-xs text-sentinel-muted">
+          <p className="mt-2 text-[13px] leading-snug text-slate-100">
+            {a.title}
+          </p>
+          <p className="mt-1 font-mono text-[11px] text-sentinel-faint">
             {a.source}
           </p>
         </li>
