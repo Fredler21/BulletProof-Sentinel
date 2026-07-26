@@ -89,6 +89,30 @@ export async function requireRole(min: UserRole): Promise<UserRoleDoc> {
   return r;
 }
 
+/**
+ * Like requireRole, but also returns the session user (needed when a handler
+ * both gates on role and uses the caller's identity, e.g. alert assignment).
+ * Verifies the session only once.
+ */
+export async function requireRoleWithUser(
+  min: UserRole,
+): Promise<{ user: SessionUser; role: UserRoleDoc }> {
+  const user = await requireSessionUser();
+  const role = await ensureRoleForUser(user);
+  if (RANK[role.role] < RANK[min]) {
+    throw new Error("FORBIDDEN");
+  }
+  return { user, role };
+}
+
+/**
+ * Maps a requireRole/requireRoleWithUser rejection to an HTTP status:
+ * 403 for an authenticated-but-under-privileged caller, 401 otherwise.
+ */
+export function roleGateStatus(err: unknown): 401 | 403 {
+  return err instanceof Error && err.message === "FORBIDDEN" ? 403 : 401;
+}
+
 export async function listAllRoles(): Promise<UserRoleDoc[]> {
   const snap = await adminDb.collection(COL).get();
   return snap.docs

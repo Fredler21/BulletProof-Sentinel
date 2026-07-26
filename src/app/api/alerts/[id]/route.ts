@@ -6,6 +6,7 @@ import {
   setAlertStatus,
 } from "@/lib/server/collab";
 import { requireSessionUser } from "@/lib/server/session";
+import { requireRoleWithUser, roleGateStatus } from "@/lib/server/roles";
 import type { AlertStatus } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -29,11 +30,17 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ): Promise<Response> {
+  // Changing an alert's status/assignment/ack is a triage action — viewers
+  // are read-only.
   let user;
   try {
-    user = await requireSessionUser();
-  } catch {
-    return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+    ({ user } = await requireRoleWithUser("it-admin"));
+  } catch (err) {
+    const status = roleGateStatus(err);
+    return NextResponse.json(
+      { error: status === 403 ? "forbidden" : "unauthenticated" },
+      { status },
+    );
   }
   const { id } = await params;
   const body = (await req.json().catch(() => ({}))) as {

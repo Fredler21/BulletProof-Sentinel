@@ -23,8 +23,14 @@ function safeFilename(name: string): string {
 
 function escapeCsv(v: string | number | null | undefined): string {
   if (v == null) return "";
-  const s = String(v);
-  if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  let s = String(v);
+  // Neutralize spreadsheet formula injection (CWE-1236): a cell starting with
+  // = + - @ (or a tab/CR that a spreadsheet strips back to one of those) is
+  // executed as a formula by Excel/Sheets. Attacker-controlled fields
+  // (userAgent, message, route) land in this export, so prefix a single quote
+  // to force the value to be treated as text.
+  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
   return s;
 }
 

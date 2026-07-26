@@ -4,6 +4,7 @@ import {
   listRecentAlerts,
 } from "@/lib/server/events";
 import { requireSessionUser } from "@/lib/server/session";
+import { requireRole, roleGateStatus } from "@/lib/server/roles";
 
 export const dynamic = "force-dynamic";
 
@@ -19,10 +20,15 @@ export async function GET(): Promise<Response> {
 }
 
 export async function PATCH(req: NextRequest): Promise<Response> {
+  // Acknowledging an alert is a triage action — viewers are read-only.
   try {
-    await requireSessionUser();
-  } catch {
-    return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+    await requireRole("it-admin");
+  } catch (err) {
+    const status = roleGateStatus(err);
+    return NextResponse.json(
+      { error: status === 403 ? "forbidden" : "unauthenticated" },
+      { status },
+    );
   }
   const body = (await req.json()) as { id?: string };
   if (!body.id) {

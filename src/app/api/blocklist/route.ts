@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { blockIp, listBlockedIps } from "@/lib/server/blocklist";
 import { requireSessionUser } from "@/lib/server/session";
+import { requireRoleWithUser, roleGateStatus } from "@/lib/server/roles";
 
 export const dynamic = "force-dynamic";
 
@@ -15,11 +16,16 @@ export async function GET(): Promise<Response> {
 }
 
 export async function POST(req: NextRequest): Promise<Response> {
+  // Blocking an IP is a defensive action — viewers are read-only.
   let user;
   try {
-    user = await requireSessionUser();
-  } catch {
-    return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+    ({ user } = await requireRoleWithUser("it-admin"));
+  } catch (err) {
+    const status = roleGateStatus(err);
+    return NextResponse.json(
+      { error: status === 403 ? "forbidden" : "unauthenticated" },
+      { status },
+    );
   }
   const body = (await req.json().catch(() => ({}))) as {
     ip?: string;

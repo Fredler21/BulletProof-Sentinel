@@ -22,8 +22,9 @@ function sanitize(messages: unknown): ChatMessage[] {
       continue;
     }
     const r = (m as { role: string }).role;
-    const role: ChatMessage["role"] =
-      r === "user" || r === "assistant" || r === "system" ? r : "user";
+    // The server owns the system prompt — never let a client inject one.
+    // Coerce anything other than assistant back to user.
+    const role: ChatMessage["role"] = r === "assistant" ? "assistant" : "user";
     out.push({ role, content: (m as { content: string }).content.slice(0, MAX_LEN) });
   }
   return out.slice(-MAX_MESSAGES);
@@ -46,7 +47,10 @@ export async function POST(req: NextRequest): Promise<Response> {
     const reply = await chat(messages);
     return NextResponse.json({ reply });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "chat_failed";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    // Log the upstream detail server-side, but don't leak it (OpenAI error
+    // bodies, model names, etc.) to the client.
+    // eslint-disable-next-line no-console
+    console.error("[ai/chat] request failed", err);
+    return NextResponse.json({ error: "chat_failed" }, { status: 500 });
   }
 }
