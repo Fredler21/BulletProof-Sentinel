@@ -36,6 +36,8 @@ export async function listReports(
   const snap = await adminDb
     .collection(REPORTS)
     .where("ownerUid", "==", ownerUid)
+    // Safety bound before the in-memory sort/slice to `limit`.
+    .limit(500)
     .get();
   return snap.docs
     .map((d) => d.data() as IncidentReport)

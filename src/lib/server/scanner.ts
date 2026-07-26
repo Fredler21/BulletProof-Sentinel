@@ -379,6 +379,8 @@ export async function listScansForAsset(
     .collection(COL)
     .where("ownerUid", "==", ownerUid)
     .where("assetId", "==", assetId)
+    // Safety bound before the in-memory sort/slice to `limit`.
+    .limit(200)
     .get();
   const items = snap.docs
     .map((d) => d.data() as ScanResult)
@@ -394,6 +396,8 @@ export async function listRecentScans(
   const snap = await adminDb
     .collection(COL)
     .where("ownerUid", "==", ownerUid)
+    // Safety bound before the in-memory sort/slice to `limit`.
+    .limit(500)
     .get();
   return snap.docs
     .map((d) => d.data() as ScanResult)

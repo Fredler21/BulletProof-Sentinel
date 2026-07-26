@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getAlert } from "@/lib/server/collab";
 import { listNotes } from "@/lib/server/collab";
 import { requireSessionUser } from "@/lib/server/session";
+import { currentUserCanRespond } from "@/lib/server/roles";
 import { adminDb } from "@/lib/firebase/admin";
 import type { SecurityEvent } from "@/lib/types";
 import { SeverityBadge } from "@/app/dashboard/_components/SeverityBadge";
@@ -30,9 +31,10 @@ export default async function AlertDetailPage({
   const alert = await getAlert(id);
   if (!alert) notFound();
 
-  const [event, notes] = await Promise.all([
+  const [event, notes, canRespond] = await Promise.all([
     getEvent(alert.eventId),
     listNotes(id),
+    currentUserCanRespond(),
   ]);
 
   return (
@@ -59,7 +61,7 @@ export default async function AlertDetailPage({
         <h1 className="text-2xl font-semibold text-white">{alert.title}</h1>
       </header>
 
-      <AlertWorkflow alert={alert} />
+      {canRespond && <AlertWorkflow alert={alert} />}
 
       {event && (
         <section className="rounded-xl border border-sentinel-border bg-sentinel-panel p-5">
@@ -75,7 +77,7 @@ export default async function AlertDetailPage({
                 event.ip ? (
                   <span className="flex items-center gap-2 font-mono text-xs">
                     {event.ip}
-                    <BlockIpButton ip={event.ip} />
+                    {canRespond && <BlockIpButton ip={event.ip} />}
                   </span>
                 ) : (
                   <span className="text-sentinel-muted">—</span>
@@ -111,7 +113,7 @@ export default async function AlertDetailPage({
         </section>
       )}
 
-      <NotesThread alertId={id} initialNotes={notes} />
+      <NotesThread alertId={id} initialNotes={notes} canPost={canRespond} />
     </div>
   );
 }

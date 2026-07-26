@@ -40,6 +40,8 @@ export async function listAssets(ownerUid: string): Promise<Asset[]> {
   const snap = await adminDb
     .collection(COL)
     .where("ownerUid", "==", ownerUid)
+    // Safety bound; a single owner is not expected to exceed this.
+    .limit(500)
     .get();
   return snap.docs
     .map((d) => d.data() as Asset)

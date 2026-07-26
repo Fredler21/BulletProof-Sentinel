@@ -43,7 +43,8 @@ export async function unblockIp(ip: string): Promise<void> {
 
 export async function listBlockedIps(): Promise<BlockedIp[]> {
   return cached("blocklist:all", 30_000, async () => {
-    const snap = await adminDb.collection(COL).get();
+    // Safety bound against unbounded reads on a large blocklist.
+    const snap = await adminDb.collection(COL).limit(1000).get();
     const now = Date.now();
     return snap.docs
       .map((d) => d.data() as BlockedIp)

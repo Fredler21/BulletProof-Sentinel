@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireSessionUser } from "@/lib/server/session";
+import { currentUserCanRespond } from "@/lib/server/roles";
 import { findProjectById } from "@/lib/server/projects";
 import { listEventsForProject } from "@/lib/server/events";
 import { getGeoForIps } from "@/lib/server/geoip";
@@ -79,9 +80,10 @@ export default async function ProjectDetailPage(
   const events = await listEventsForProject(id, 150);
   const attackers = summarizeAttackers(events);
   const ips = attackers.map((a) => a.ip);
-  const [geo, blocks] = await Promise.all([
+  const [geo, blocks, canRespond] = await Promise.all([
     getGeoForIps(ips),
     listBlockedIps(),
+    currentUserCanRespond(),
   ]);
   const blockedSet = new Set(blocks.map((b) => b.ip));
 
@@ -220,11 +222,21 @@ export default async function ProjectDetailPage(
                         <TimeAgo timestamp={a.lastSeenAt} />
                       </td>
                       <td className="px-4 py-2 text-right">
-                        <BlockIpButton
-                          ip={a.ip}
-                          reason={`From project ${project.name}`}
-                          initiallyBlocked={blockedSet.has(a.ip)}
-                        />
+                        {canRespond ? (
+                          <BlockIpButton
+                            ip={a.ip}
+                            reason={`From project ${project.name}`}
+                            initiallyBlocked={blockedSet.has(a.ip)}
+                          />
+                        ) : blockedSet.has(a.ip) ? (
+                          <span className="text-[10px] uppercase tracking-wide text-sentinel-danger">
+                            Blocked
+                          </span>
+                        ) : (
+                          <span className="text-[10px] uppercase tracking-wide text-sentinel-muted">
+                            view only
+                          </span>
+                        )}
                       </td>
                     </tr>
                   );

@@ -60,6 +60,8 @@ export async function listNotes(alertId: string): Promise<AlertNote[]> {
   const snap = await adminDb
     .collection(NOTES)
     .where("alertId", "==", alertId)
+    // Safety bound so a single alert can't trigger an unbounded read.
+    .limit(500)
     .get();
   return snap.docs
     .map((d) => d.data() as AlertNote)

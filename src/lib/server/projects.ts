@@ -52,6 +52,8 @@ export async function listProjectsForUser(
     const snap = await adminDb
       .collection(COL)
       .where("ownerUid", "==", ownerUid)
+      // Safety bound against unbounded reads for a single owner.
+      .limit(500)
       .get();
     return snap.docs
       .map((d) => d.data() as HoneypotProject)

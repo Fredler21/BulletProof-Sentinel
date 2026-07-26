@@ -1,5 +1,6 @@
 import { listBlockedIps } from "@/lib/server/blocklist";
 import { requireSessionUser } from "@/lib/server/session";
+import { currentUserCanRespond } from "@/lib/server/roles";
 import { TimeAgo } from "@/app/dashboard/_components/TimeAgo";
 import { BlocklistActions } from "@/app/dashboard/blocklist/_components/BlocklistActions";
 import { UnblockButton } from "@/app/dashboard/blocklist/_components/UnblockButton";
@@ -8,7 +9,10 @@ export const dynamic = "force-dynamic";
 
 export default async function BlocklistPage(): Promise<React.ReactElement> {
   await requireSessionUser();
-  const blocks = await listBlockedIps();
+  const [blocks, canRespond] = await Promise.all([
+    listBlockedIps(),
+    currentUserCanRespond(),
+  ]);
   return (
     <div className="space-y-6">
       <div>
@@ -19,7 +23,14 @@ export default async function BlocklistPage(): Promise<React.ReactElement> {
         </p>
       </div>
 
-      <BlocklistActions />
+      {canRespond ? (
+        <BlocklistActions />
+      ) : (
+        <p className="rounded-xl border border-sentinel-border bg-sentinel-panel px-4 py-3 text-xs text-sentinel-muted">
+          Read-only: your role can view the blocklist but cannot add or remove
+          blocks. Ask an administrator for responder access.
+        </p>
+      )}
 
       <div className="overflow-x-auto rounded-xl border border-sentinel-border bg-sentinel-panel">
         <table className="w-full text-left text-sm">
@@ -54,7 +65,11 @@ export default async function BlocklistPage(): Promise<React.ReactElement> {
                 </td>
                 <td className="px-4 py-2 text-xs text-slate-300">{b.hits}</td>
                 <td className="px-4 py-2 text-right">
-                  <UnblockButton ip={b.ip} />
+                  {canRespond ? (
+                    <UnblockButton ip={b.ip} />
+                  ) : (
+                    <span className="text-[11px] text-sentinel-muted">—</span>
+                  )}
                 </td>
               </tr>
             ))}

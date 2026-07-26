@@ -113,8 +113,26 @@ export function roleGateStatus(err: unknown): 401 | 403 {
   return err instanceof Error && err.message === "FORBIDDEN" ? 403 : 401;
 }
 
+/** Minimum role allowed to perform defensive response actions. */
+export const RESPONDER_MIN_ROLE: UserRole = "it-admin";
+
+/** True if the role may perform defensive writes (block IPs, triage alerts). */
+export function canRespond(role: UserRole): boolean {
+  return RANK[role] >= RANK[RESPONDER_MIN_ROLE];
+}
+
+/**
+ * Convenience for server components: does the current session's role permit
+ * defensive response actions? Used to hide write controls from viewers.
+ */
+export async function currentUserCanRespond(): Promise<boolean> {
+  const role = await getCurrentRole();
+  return !!role && canRespond(role.role);
+}
+
 export async function listAllRoles(): Promise<UserRoleDoc[]> {
-  const snap = await adminDb.collection(COL).get();
+  // Safety bound against unbounded reads on the user_roles collection.
+  const snap = await adminDb.collection(COL).limit(1000).get();
   return snap.docs
     .map((d) => d.data() as UserRoleDoc)
     .sort((a, b) => RANK[b.role] - RANK[a.role]);

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { listTraps } from "@/lib/server/honeypots";
 import { listEventsForRoute } from "@/lib/server/events";
 import { listBlockedIps } from "@/lib/server/blocklist";
+import { currentUserCanRespond } from "@/lib/server/roles";
 import { BlockIpButton } from "@/app/dashboard/alerts/_components/BlockIpButton";
 import type { SecurityEvent } from "@/lib/types";
 
@@ -81,7 +82,10 @@ export default async function HoneypotDetailPage({
   const events = await listEventsForRoute(trap.path, 150);
   const ips = rollupByIp(events);
 
-  const blocked = await listBlockedIps();
+  const [blocked, canRespond] = await Promise.all([
+    listBlockedIps(),
+    currentUserCanRespond(),
+  ]);
   const blockedSet = new Set(blocked.map((b) => b.ip));
 
   return (
@@ -170,12 +174,16 @@ export default async function HoneypotDetailPage({
                       <span className="rounded-md border border-sentinel-danger/40 bg-sentinel-danger/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-sentinel-danger">
                         Blocked
                       </span>
-                    ) : (
+                    ) : canRespond ? (
                       <BlockIpButton
                         ip={r.ip}
                         reason={`Manual block from honeypot: ${trap.name}`}
                         ttlHours={24}
                       />
+                    ) : (
+                      <span className="text-[10px] uppercase tracking-wide text-sentinel-muted">
+                        view only
+                      </span>
                     )}
                   </td>
                 </tr>

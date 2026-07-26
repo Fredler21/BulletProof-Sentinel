@@ -6,9 +6,11 @@ import type { AlertNote } from "@/lib/types";
 export function NotesThread({
   alertId,
   initialNotes,
+  canPost = true,
 }: {
   alertId: string;
   initialNotes: AlertNote[];
+  canPost?: boolean;
 }): React.ReactElement {
   const [notes, setNotes] = useState<AlertNote[]>(initialNotes);
   const [body, setBody] = useState<string>("");
@@ -68,29 +70,35 @@ export function NotesThread({
         )}
       </ul>
 
-      <form onSubmit={onSubmit} className="border-t border-sentinel-border p-3">
-        <textarea
-          rows={3}
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder="Add a note for the team…"
-          className="w-full resize-y rounded-md border border-sentinel-border bg-sentinel-bg px-3 py-2 text-sm text-slate-100 outline-none focus:border-sentinel-accent"
-        />
-        <div className="mt-2 flex items-center justify-between">
-          {error ? (
-            <p className="text-xs text-sentinel-danger">{error}</p>
-          ) : (
-            <span />
-          )}
-          <button
-            type="submit"
-            disabled={busy || !body.trim()}
-            className="rounded-md bg-sentinel-accent px-3 py-1.5 text-xs font-medium text-slate-900 hover:bg-cyan-300 disabled:opacity-60"
-          >
-            {busy ? "Posting…" : "Post note"}
-          </button>
-        </div>
-      </form>
+      {canPost ? (
+        <form onSubmit={onSubmit} className="border-t border-sentinel-border p-3">
+          <textarea
+            rows={3}
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder="Add a note for the team…"
+            className="w-full resize-y rounded-md border border-sentinel-border bg-sentinel-bg px-3 py-2 text-sm text-slate-100 outline-none focus:border-sentinel-accent"
+          />
+          <div className="mt-2 flex items-center justify-between">
+            {error ? (
+              <p className="text-xs text-sentinel-danger">{error}</p>
+            ) : (
+              <span />
+            )}
+            <button
+              type="submit"
+              disabled={busy || !body.trim()}
+              className="rounded-md bg-sentinel-accent px-3 py-1.5 text-xs font-medium text-slate-900 hover:bg-cyan-300 disabled:opacity-60"
+            >
+              {busy ? "Posting…" : "Post note"}
+            </button>
+          </div>
+        </form>
+      ) : (
+        <p className="border-t border-sentinel-border p-3 text-center text-xs text-sentinel-muted">
+          Read-only: your role cannot post notes.
+        </p>
+      )}
     </section>
   );
 }
